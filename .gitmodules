@@ -1,0 +1,3 @@
+[submodule "tools/DeviceExplorer/MsCommon.ClickOnce"]
+	path = tools/DeviceExplorer/MsCommon.ClickOnce
+	url = git@github.com:martijns/MsCommon.ClickOnce.git
