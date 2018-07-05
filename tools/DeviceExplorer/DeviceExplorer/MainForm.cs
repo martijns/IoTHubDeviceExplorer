@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Common;
-using Microsoft.Azure.Devices.Common.Security;
 using Microsoft.ServiceBus.Messaging;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using Microsoft.Azure.Devices.Client;
+using DeliveryAcknowledgement = Microsoft.Azure.Devices.DeliveryAcknowledgement;
+using IotHubConnectionStringBuilder = Microsoft.Azure.Devices.IotHubConnectionStringBuilder;
+using Message = Microsoft.Azure.Devices.Client.Message;
+using SharedAccessSignatureBuilder = Microsoft.Azure.Devices.Common.Security.SharedAccessSignatureBuilder;
 
 namespace DeviceExplorer
 {
@@ -39,10 +43,12 @@ namespace DeviceExplorer
         private static int deviceSelectedIndexForEvent = 0;
         private static int deviceSelectedIndexForC2DMessage = 0;
         private static int deviceSelectedIndexForDeviceMethod = 0;
+        private static int deviceSelectedIndexForMessageAsDevice = 0;
 
         private static CancellationTokenSource ctsForDataMonitoring;
         private static CancellationTokenSource ctsForFeedbackMonitoring;
         private static CancellationTokenSource ctsForDeviceMethod;
+        private static CancellationTokenSource ctsForMessageAsDevice;
 
         private const string DEFAULT_CONSUMER_GROUP = "$Default";
 
@@ -143,6 +149,7 @@ namespace DeviceExplorer
                 iotHubNameTextBox.Text = iotHubName;
                 eventHubNameTextBoxForDataTab.Text = iotHubName;
                 iotHubNameTextBoxForDeviceMethod.Text = iotHubName;
+                iotHubNameTextBoxForMessageAsDevice.Text = iotHubName;
 
                 activeIoTHubConnectionString = connectionString;
             }
@@ -162,6 +169,7 @@ namespace DeviceExplorer
                 List<string> deviceIdsForEvent = new List<string>();
                 List<string> deviceIdsForC2DMessage = new List<string>();
                 List<string> deviceIdsForDeviceMethod = new List<string>();
+                List<string> deviceIdsForMessageAsDevice = new List<string>();
                 RegistryManager registryManager = RegistryManager.CreateFromConnectionString(activeIoTHubConnectionString);
 
                 var devices = await registryManager.GetDevicesAsync(MAX_COUNT_OF_DEVICES);
@@ -170,15 +178,18 @@ namespace DeviceExplorer
                     deviceIdsForEvent.Add(device.Id);
                     deviceIdsForC2DMessage.Add(device.Id);
                     deviceIdsForDeviceMethod.Add(device.Id);
+                    deviceIdsForMessageAsDevice.Add(device.Id);
                 }
                 await registryManager.CloseAsync();
                 deviceIDsComboBoxForEvent.DataSource = deviceIdsForEvent.OrderBy(c => c).ToList();
                 deviceIDsComboBoxForCloudToDeviceMessage.DataSource = deviceIdsForC2DMessage.OrderBy(c => c).ToList();
                 deviceIDsComboBoxForDeviceMethod.DataSource = deviceIdsForDeviceMethod.OrderBy(c => c).ToList();
+                deviceIDsComboBoxForMessageAsDevice.DataSource = deviceIdsForMessageAsDevice.OrderBy(c => c).ToList();
 
                 deviceIDsComboBoxForEvent.SelectedIndex = deviceSelectedIndexForEvent;
                 deviceIDsComboBoxForCloudToDeviceMessage.SelectedIndex = deviceSelectedIndexForC2DMessage;
                 deviceIDsComboBoxForDeviceMethod.SelectedIndex = deviceSelectedIndexForDeviceMethod;
+                deviceIDsComboBoxForMessageAsDevice.SelectedIndex = deviceSelectedIndexForMessageAsDevice;
             }
         }
         private void persistSettingsToAppConfig()
@@ -852,7 +863,7 @@ namespace DeviceExplorer
         {
             try
             {
-                if (e.TabPage == tabData || e.TabPage == tabMessagesToDevice || e.TabPage == tabDeviceMethod)
+                if (e.TabPage == tabData || e.TabPage == tabMessagesToDevice || e.TabPage == tabDeviceMethod || e.TabPage == tabMessageAsDevice)
                 {
                     await updateDeviceIdsComboBoxes(runIfNullOrEmpty: false);
                 }
@@ -1181,5 +1192,63 @@ namespace DeviceExplorer
             return true;
         }
         #endregion
+
+        #region Message As Device
+
+        private void deviceIDsComboBoxForMessageAsDevice_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            deviceSelectedIndexForMessageAsDevice = ((ComboBox)sender).SelectedIndex;
+        }
+
+        #endregion
+
+        private async void sendMessageButtonForMessageAsDevice_Click(object sender, EventArgs e)
+        {
+            ((Button) sender).Enabled = false;
+            try
+            {
+                if (allDevices == null)
+                    await updateDevicesGridView();
+
+                string deviceId = deviceIDsComboBoxForMessageAsDevice.SelectedItem.ToString();
+                string encoding = encodingTextboxForMessageAsDevice.Text;
+                string contenttype = contentTypeTextboxForMessageAsDevice.Text;
+                DeviceEntity device = allDevices.First(d => d.Id == deviceId);
+                string deviceConnStr = device.ConnectionString;
+                string message = messageTextboxForMessageAsDevice.Text;
+
+                if (device.ConnectionState == "Connected")
+                {
+                    var res = MessageBox.Show("This device is already connected! Continuing means that the existing connection is closed. Are you sure you want to continue?", "Already in use!", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
+                    if (res != DialogResult.Yes)
+                        return;
+                }
+
+                using (var client = DeviceClient.CreateFromConnectionString(deviceConnStr))
+                {
+                    byte[] data = null;
+                    if (string.IsNullOrWhiteSpace(encoding))
+                        data = Encoding.UTF8.GetBytes(message);
+                    else
+                        data = Encoding.GetEncoding(encoding).GetBytes(message);
+
+                    Message msg = new Message(data);
+                    msg.ContentEncoding = string.IsNullOrWhiteSpace(encoding) ? null : encoding;
+                    msg.ContentType = string.IsNullOrWhiteSpace(contenttype) ? null : contenttype;
+
+                    await client.SendEventAsync(msg);
+
+                    lastSentLabelForMessageAsDevice.Text = "Last succesfully sent: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Message As Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                ((Button)sender).Enabled = true;
+            }
+        }
     }
 }
