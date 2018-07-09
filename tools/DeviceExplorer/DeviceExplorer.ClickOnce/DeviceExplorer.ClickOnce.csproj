@@ -24,10 +24,11 @@
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>http://martijn.tikkie.net/apps/IoTHubDeviceExplorer/</InstallUrl>
     <SupportUrl>http://www.tikkie.net</SupportUrl>
-    <ProductName>IoTHubDeviceExplorer</ProductName>
+    <ProductName>IoT Hub DeviceExplorer</ProductName>
     <PublisherName>Tikkie</PublisherName>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>7</ApplicationRevision>
+    <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
