@@ -1250,5 +1250,13 @@ namespace DeviceExplorer
                 ((Button)sender).Enabled = true;
             }
         }
+
+        private void HandleMessageAsDeviceTextboxKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                ((TextBox) sender)?.SelectAll();
+            }
+        }
     }
 }

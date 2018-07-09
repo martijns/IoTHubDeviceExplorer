@@ -128,9 +128,10 @@
             this.label17 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
-            this.ehStringToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabMessageAsDevice = new System.Windows.Forms.TabPage();
-            this.label23 = new System.Windows.Forms.Label();
+            this.lastSentLabelForMessageAsDevice = new System.Windows.Forms.Label();
+            this.contentTypeTextboxForMessageAsDevice = new System.Windows.Forms.TextBox();
+            this.label28 = new System.Windows.Forms.Label();
             this.sendMessageButtonForMessageAsDevice = new System.Windows.Forms.Button();
             this.deviceIDsComboBoxForMessageAsDevice = new System.Windows.Forms.ComboBox();
             this.messageTextboxForMessageAsDevice = new System.Windows.Forms.TextBox();
@@ -140,9 +141,8 @@
             this.label25 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
-            this.contentTypeTextboxForMessageAsDevice = new System.Windows.Forms.TextBox();
-            this.label28 = new System.Windows.Forms.Label();
-            this.lastSentLabelForMessageAsDevice = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.ehStringToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabCallDeviceMethod.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -1310,15 +1310,33 @@
             this.tabMessageAsDevice.Text = "Send message as device";
             this.tabMessageAsDevice.UseVisualStyleBackColor = true;
             // 
-            // label23
+            // lastSentLabelForMessageAsDevice
             // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(13, 19);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(673, 16);
-            this.label23.TabIndex = 1;
-            this.label23.Text = "Send a message on behalf of a device to the IoT Hub. The client will connect, sen" +
-    "d the message and disconnect.";
+            this.lastSentLabelForMessageAsDevice.AutoSize = true;
+            this.lastSentLabelForMessageAsDevice.Location = new System.Drawing.Point(359, 364);
+            this.lastSentLabelForMessageAsDevice.Name = "lastSentLabelForMessageAsDevice";
+            this.lastSentLabelForMessageAsDevice.Size = new System.Drawing.Size(133, 16);
+            this.lastSentLabelForMessageAsDevice.TabIndex = 22;
+            this.lastSentLabelForMessageAsDevice.Text = "Last succesfully sent:";
+            // 
+            // contentTypeTextboxForMessageAsDevice
+            // 
+            this.contentTypeTextboxForMessageAsDevice.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.contentTypeTextboxForMessageAsDevice.Location = new System.Drawing.Point(140, 141);
+            this.contentTypeTextboxForMessageAsDevice.Name = "contentTypeTextboxForMessageAsDevice";
+            this.contentTypeTextboxForMessageAsDevice.Size = new System.Drawing.Size(592, 22);
+            this.contentTypeTextboxForMessageAsDevice.TabIndex = 21;
+            this.contentTypeTextboxForMessageAsDevice.Text = "application/json";
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(21, 141);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(92, 16);
+            this.label28.TabIndex = 20;
+            this.label28.Text = "Content-Type:";
             // 
             // sendMessageButtonForMessageAsDevice
             // 
@@ -1344,14 +1362,19 @@
             // 
             // messageTextboxForMessageAsDevice
             // 
+            this.messageTextboxForMessageAsDevice.AcceptsReturn = true;
+            this.messageTextboxForMessageAsDevice.AcceptsTab = true;
             this.messageTextboxForMessageAsDevice.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.messageTextboxForMessageAsDevice.Location = new System.Drawing.Point(140, 171);
             this.messageTextboxForMessageAsDevice.Multiline = true;
             this.messageTextboxForMessageAsDevice.Name = "messageTextboxForMessageAsDevice";
+            this.messageTextboxForMessageAsDevice.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.messageTextboxForMessageAsDevice.Size = new System.Drawing.Size(592, 180);
             this.messageTextboxForMessageAsDevice.TabIndex = 17;
             this.messageTextboxForMessageAsDevice.Text = "{ \"MethodPayload\": \"Payload\" }";
+            this.messageTextboxForMessageAsDevice.WordWrap = false;
+            this.messageTextboxForMessageAsDevice.KeyDown += new System.Windows.Forms.KeyEventHandler(this.HandleMessageAsDeviceTextboxKeyDown);
             // 
             // encodingTextboxForMessageAsDevice
             // 
@@ -1409,33 +1432,15 @@
             this.label27.TabIndex = 11;
             this.label27.Text = "IoT Hub:";
             // 
-            // contentTypeTextboxForMessageAsDevice
+            // label23
             // 
-            this.contentTypeTextboxForMessageAsDevice.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.contentTypeTextboxForMessageAsDevice.Location = new System.Drawing.Point(140, 141);
-            this.contentTypeTextboxForMessageAsDevice.Name = "contentTypeTextboxForMessageAsDevice";
-            this.contentTypeTextboxForMessageAsDevice.Size = new System.Drawing.Size(592, 22);
-            this.contentTypeTextboxForMessageAsDevice.TabIndex = 21;
-            this.contentTypeTextboxForMessageAsDevice.Text = "application/json";
-            // 
-            // label28
-            // 
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(21, 141);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(92, 16);
-            this.label28.TabIndex = 20;
-            this.label28.Text = "Content-Type:";
-            // 
-            // lastSentLabelForMessageAsDevice
-            // 
-            this.lastSentLabelForMessageAsDevice.AutoSize = true;
-            this.lastSentLabelForMessageAsDevice.Location = new System.Drawing.Point(359, 364);
-            this.lastSentLabelForMessageAsDevice.Name = "lastSentLabelForMessageAsDevice";
-            this.lastSentLabelForMessageAsDevice.Size = new System.Drawing.Size(133, 16);
-            this.lastSentLabelForMessageAsDevice.TabIndex = 22;
-            this.lastSentLabelForMessageAsDevice.Text = "Last succesfully sent:";
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(13, 19);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(673, 16);
+            this.label23.TabIndex = 1;
+            this.label23.Text = "Send a message on behalf of a device to the IoT Hub. The client will connect, sen" +
+    "d the message and disconnect.";
             // 
             // MainForm
             // 
