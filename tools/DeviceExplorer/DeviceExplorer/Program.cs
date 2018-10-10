@@ -14,7 +14,6 @@ namespace DeviceExplorer
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
-            //bla
         }
     }
 }
