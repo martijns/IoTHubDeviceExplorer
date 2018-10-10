@@ -546,7 +546,7 @@ namespace DeviceExplorer
                     }
                 }
 
-                Func<bool> processor = new Func<bool>(()=>ProcessOutput(eventHubReceiver, selectedDevice, ct));
+                Func<bool> processor = new Func<bool>(() => ProcessOutput(eventHubReceiver, selectedDevice, ct));
                 await Task.Run(processor, ct);
 
             }
@@ -1204,7 +1204,7 @@ namespace DeviceExplorer
 
         private async void sendMessageButtonForMessageAsDevice_Click(object sender, EventArgs e)
         {
-            ((Button) sender).Enabled = false;
+            ((Button)sender).Enabled = false;
             try
             {
                 if (allDevices == null)
@@ -1215,7 +1215,7 @@ namespace DeviceExplorer
                 string contenttype = contentTypeTextboxForMessageAsDevice.Text;
                 DeviceEntity device = allDevices.First(d => d.Id == deviceId);
                 string deviceConnStr = device.ConnectionString;
-                string message = messageTextboxForMessageAsDevice.Text;
+                string input = messageTextboxForMessageAsDevice.Text;
 
                 if (device.ConnectionState == "Connected")
                 {
@@ -1224,21 +1224,29 @@ namespace DeviceExplorer
                         return;
                 }
 
+                var timedMessages = JsonConvert.DeserializeObject<List<TimedMessage>>(input);
                 using (var client = DeviceClient.CreateFromConnectionString(deviceConnStr))
                 {
-                    byte[] data = null;
-                    if (string.IsNullOrWhiteSpace(encoding))
-                        data = Encoding.UTF8.GetBytes(message);
-                    else
-                        data = Encoding.GetEncoding(encoding).GetBytes(message);
+                    foreach (var timedMessage in timedMessages)
+                    {
+                        Thread.Sleep((int)TimeSpan.FromSeconds(timedMessage.TimeStart).TotalMilliseconds);
+                        foreach (var payload in timedMessage.Payload)
+                        {
+                            var message = payload.ToString();
+                            byte[] data = null;
+                            if (string.IsNullOrWhiteSpace(encoding))
+                                data = Encoding.UTF8.GetBytes(message);
+                            else
+                                data = Encoding.GetEncoding(encoding).GetBytes(message);
 
-                    Message msg = new Message(data);
-                    msg.ContentEncoding = string.IsNullOrWhiteSpace(encoding) ? null : encoding;
-                    msg.ContentType = string.IsNullOrWhiteSpace(contenttype) ? null : contenttype;
+                            Message msg = new Message(data);
+                            msg.ContentEncoding = string.IsNullOrWhiteSpace(encoding) ? null : encoding;
+                            msg.ContentType = string.IsNullOrWhiteSpace(contenttype) ? null : contenttype;
 
-                    await client.SendEventAsync(msg);
-
-                    lastSentLabelForMessageAsDevice.Text = "Last succesfully sent: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            await client.SendEventAsync(msg);                            
+                        }
+                        sentTextboxForMessageAsDevice.AppendText("Message batch sent at: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\n");
+                    }
                 }
             }
             catch (Exception exc)
@@ -1255,7 +1263,7 @@ namespace DeviceExplorer
         {
             if (e.Control && e.KeyCode == Keys.A)
             {
-                ((TextBox) sender)?.SelectAll();
+                ((TextBox)sender)?.SelectAll();
             }
         }
     }

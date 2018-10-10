@@ -106,6 +106,7 @@
       <DependentUpon>SASTokenForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SortableBindingList.cs" />
+    <Compile Include="TimedMessage.cs" />
     <EmbeddedResource Include="CreateDeviceForm.resx">
       <DependentUpon>CreateDeviceForm.cs</DependentUpon>
     </EmbeddedResource>
